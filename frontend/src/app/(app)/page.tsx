@@ -1,9 +1,5 @@
 import RecentTransaction from "@/components/dashboard/RecentTransaction";
 import SummaryCard from "@/components/dashboard/SummaryCard";
-import Image from "next/image";
-import { FaMoneyBillWave } from "react-icons/fa6";
-import { GiPayMoney } from "react-icons/gi";
-import { GrMoney } from "react-icons/gr";
 
 export default function Home() {
   return (
