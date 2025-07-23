@@ -35,7 +35,7 @@ func (t *transactionRepo) SummaryTransaction() ([]models.Transaction, error) {
 func (t *transactionRepo) GetTransaction(userId uint) ([]models.Transaction, error) {
 	var data []models.Transaction
 
-	err := t.db.Where("user_id = ?", userId).Find(&data).Error
+	err := t.db.Order("created_at desc").Where("user_id = ?", userId).Find(&data).Error
 	return data, err
 }
 
@@ -64,7 +64,7 @@ func (t *transactionRepo) GetTransactionFilter(filterType, startDate, endDate st
 		query = query.Where("created_at <= ?", parsedEndDate.Add(24*time.Hour).Add(-time.Second)) // untuk mencakup hingga akhir hari
 	}
 
-	err := query.Where("user_id = ?", userId).Find(&data).Error
+	err := query.Order("created_at desc").Where("user_id = ?", userId).Find(&data).Error
 	return data, err
 }
 
