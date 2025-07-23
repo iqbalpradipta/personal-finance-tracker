@@ -1,23 +1,29 @@
-import React from "react";
+"use client";
+
+import React, { SetStateAction } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { MdDashboard } from "react-icons/md";
 import { FaScroll, FaUserPlus } from "react-icons/fa";
 import { CiLogin } from "react-icons/ci";
-import { IoSettingsOutline } from "react-icons/io5";
-import { LuWallet } from "react-icons/lu";
+import { TbUserSquare } from "react-icons/tb";
 import { RiLogoutBoxLine } from "react-icons/ri";
+import { toast, Bounce } from "react-toastify";
+import { parseAndValidateToken } from "@/utils/auth";
 
 function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const [token, setToken] = React.useState<string | null>(null);
+  const [user, setUser] = React.useState<string | undefined>();
 
   const getNavLink = (href: string) => {
     const isActive = pathname === href;
 
     const linkClasses = `
-      flex items-center py-2.5 px-6 mx-3 rounded-lg
-      font-medium text-sm transition-all duration-200 ease-in-out
+      flex items-center py-2.5 px-6 mx-3 rounded-lg font-medium text-sm transition-all duration-200 ease-in-out
       ${
         isActive
           ? "bg-blue-600 text-white shadow-md"
@@ -30,6 +36,48 @@ function Sidebar() {
     }`;
 
     return { linkClasses, iconClasses };
+  };
+
+  React.useEffect(() => {
+    const storedToken = localStorage.getItem("authToken");
+    const decodeToken = parseAndValidateToken(storedToken);
+    if (!storedToken) {
+      router.push("/login");
+      return;
+    }
+
+    setToken(storedToken);
+    setUser(decodeToken?.Name);
+  }, [router]);
+
+  const LogoutHandle = () => {
+    try {
+      localStorage.removeItem("authToken");
+      toast.success("Logout Berhasil !", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+      window.location.reload();
+    } catch (error) {
+      toast.error(`Something error when Logout`, {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+    }
   };
 
   return (
@@ -63,8 +111,8 @@ function Sidebar() {
           </h3>
           <ul>
             <li className="mb-1">
-              <Link href="/" className={getNavLink("/").linkClasses}>
-                <span className={getNavLink("/").iconClasses}>
+              <Link href="/dashboard" className={getNavLink("/dashboard").linkClasses}>
+                <span className={getNavLink("/dashboard").iconClasses}>
                   <MdDashboard className="h-5 w-5" />
                 </span>
                 <span>Dashboard</span>
@@ -81,57 +129,71 @@ function Sidebar() {
                 <span>Transaction</span>
               </Link>
             </li>
-            <li className="mb-1">
-              <Link
-                href="/wallets"
-                className={getNavLink("/wallets").linkClasses}
-              >
-                <span className={getNavLink("/wallets").iconClasses}>
-                  <LuWallet className="h-5 w-5" />
-                </span>
-                <span>Wallets</span>
-              </Link>
-            </li>
           </ul>
         </div>
 
-        <div className="mb-6">
-          <h3 className="text-xs font-medium uppercase text-gray-500 px-6 mb-3">
-            Authentication
-          </h3>
-          <ul>
-            <li className="mb-1">
-              <Link href="/login" className={getNavLink("/login").linkClasses}>
-                <span className={getNavLink("/login").iconClasses}>
-                  <CiLogin className="h-5 w-5" />
-                </span>
-                <span>Login</span>
-              </Link>
-            </li>
-            <li className="mb-1">
-              <Link
-                href="/register"
-                className={getNavLink("/register").linkClasses}
-              >
-                <span className={getNavLink("/register").iconClasses}>
-                  <FaUserPlus className="h-5 w-5" />
-                </span>
-                <span>Register</span>
-              </Link>
-            </li>
-            <li className="mb-1">
-              <Link
-                href="/logout"
-                className={getNavLink("/logout").linkClasses}
-              >
-                <span className={getNavLink("/logout").iconClasses}>
-                  <RiLogoutBoxLine className="h-5 w-5" />
-                </span>
-                <span>Logout</span>
-              </Link>
-            </li>
-          </ul>
-        </div>
+        {!token ? (
+          <div className="mb-6">
+            <h3 className="text-xs font-medium uppercase text-gray-500 px-6 mb-3">
+              Authentication
+            </h3>
+            <ul>
+              <li className="mb-1">
+                <Link
+                  href="/login"
+                  className={getNavLink("/login").linkClasses}
+                >
+                  <span className={getNavLink("/login").iconClasses}>
+                    <CiLogin className="h-5 w-5" />
+                  </span>
+                  <span>Login</span>
+                </Link>
+              </li>
+              <li className="mb-1">
+                <Link
+                  href="/register"
+                  className={getNavLink("/register").linkClasses}
+                >
+                  <span className={getNavLink("/register").iconClasses}>
+                    <FaUserPlus className="h-5 w-5" />
+                  </span>
+                  <span>Register</span>
+                </Link>
+              </li>
+            </ul>
+          </div>
+        ) : (
+          <div className="mb-6">
+            <h3 className="text-xs font-medium uppercase text-gray-500 px-6 mb-3">
+              Welcome
+            </h3>
+            <ul>
+              <li className="mb-1">
+                <Link
+                  href="#"
+                  className="flex items-center py-2.5 px-6 mx-3 rounded-lg font-medium text-sm transition-all duration-200 ease-in-out text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                >
+                  <span className="mr-4 text-gray-500 group-hover:text-gray-700">
+                    <TbUserSquare className="h-5 w-5" />
+                  </span>
+                  <span>{user}</span>
+                </Link>
+              </li>
+              <li className="mb-1">
+                <Link
+                  href="/dashboard"
+                  onClick={LogoutHandle}
+                  className="flex items-center py-2.5 px-6 mx-3 rounded-lg font-medium text-sm transition-all duration-200 ease-in-out text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                >
+                  <span className="mr-4 text-gray-500 group-hover:text-gray-700">
+                    <RiLogoutBoxLine className="h-5 w-5" />
+                  </span>
+                  <span>Logout</span>
+                </Link>
+              </li>
+            </ul>
+          </div>
+        )}
       </nav>
 
       <div className="absolute bottom-0 w-full p-6 text-center text-xs text-gray-400">

@@ -28,13 +28,9 @@ export default function RootLayout({
         ></div>
       )}
       <div
-        className={`
-          w-64 bg-white shadow-xl h-screen overflow-y-auto z-50
-          fixed inset-y-0 left-0
-          transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-          md:relative md:translate-x-0 md:block md:flex-shrink-0
-          transition-transform duration-300 ease-in-out
-        `}
+        className={`w-64 bg-white shadow-xl h-screen overflow-y-auto z-50 fixed inset-y-0 left-0 transform ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:relative md:translate-x-0 md:block md:flex-shrink-0 transition-transform duration-300 ease-in-out`}
       >
         <Sidebar />
       </div>

@@ -1,7 +1,87 @@
+"use client";
+
+import { LoginSchema } from "@/validation/userValidation";
+import axios from "axios";
 import Link from "next/link";
-import React from "react";
+import { useRouter } from "next/navigation";
+import React, { SyntheticEvent } from "react";
+import { Bounce, toast } from "react-toastify";
 
 function login() {
+  const router = useRouter();
+  const [name, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+
+  const handleSubmit = async (e: SyntheticEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      await LoginSchema.validate({ email, password }, { abortEarly: false });
+      const response = await axios.post("http://localhost:8000/api/login", {
+        email,
+        password,
+      });
+
+      const token = response.data.data;
+      localStorage.setItem("authToken", token);
+
+      toast.success("Login Berhasil !", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+
+      setName("");
+      setEmail("");
+      setPassword("");
+      router.push("/");
+    } catch (error: any) {
+      if (error.status == 500) {
+        toast.error(`Email atau Password salah.`, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      } else {
+        toast.error(`${error.message}`, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === "name") setName(value);
+    else if (name === "email") setEmail(value);
+    else if (name === "password") setPassword(value);
+  };
+
   return (
     <div className="container flex justify-center-safe">
       <div className="rounded-sm p-10 w-150 h-auto">
@@ -58,10 +138,8 @@ function login() {
                 Or
               </div>
 
-              {/* Form */}
-              <form>
+              <form onSubmit={handleSubmit}>
                 <div className="grid gap-y-4">
-                  {/* Form Group */}
                   <div>
                     <label
                       htmlFor="email"
@@ -77,6 +155,8 @@ function login() {
                         className="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
                         required
                         aria-describedby="email-error"
+                        value={email}
+                        onChange={handleInputChange}
                       />
                       <div className="hidden absolute inset-y-0 end-0 pointer-events-none pe-3">
                         <svg
@@ -91,17 +171,8 @@ function login() {
                         </svg>
                       </div>
                     </div>
-                    <p
-                      className="hidden text-xs text-red-600 mt-2"
-                      id="email-error"
-                    >
-                      Please include a valid email address so we can get back to
-                      you
-                    </p>
                   </div>
-                  {/* End Form Group */}
 
-                  {/* Form Group */}
                   <div>
                     <div className="flex flex-wrap justify-between items-center gap-2">
                       <label
@@ -125,6 +196,8 @@ function login() {
                         className="py-2.5 sm:py-3 px-4 block w-full border border-gray-200  rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
                         required
                         aria-describedby="password-error"
+                        value={password}
+                        onChange={handleInputChange}
                       />
                       <div className="hidden absolute inset-y-0 end-0 pointer-events-none pe-3">
                         <svg
@@ -139,24 +212,17 @@ function login() {
                         </svg>
                       </div>
                     </div>
-                    <p
-                      className="hidden text-xs text-red-600 mt-2"
-                      id="password-error"
-                    >
-                      8+ characters required
-                    </p>
                   </div>
-                  {/* End Form Group */}
 
                   <button
                     type="submit"
                     className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                    disabled={loading}
                   >
-                    Sign in
+                    {loading ? "Loading..." : "Sign In"}
                   </button>
                 </div>
               </form>
-              {/* End Form */}
             </div>
           </div>
         </div>
