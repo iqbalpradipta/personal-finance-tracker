@@ -52,7 +52,7 @@ func (t *transactionRepo) GetTransactionFilter(filterType, startDate, endDate st
 		if err != nil {
 			return nil, err
 		}
-		query = query.Where("date >= ?", parsedStartDate)
+		query = query.Where("created_at >= ?", parsedStartDate)
 	}
 
 	if endDate != "" {
@@ -61,10 +61,8 @@ func (t *transactionRepo) GetTransactionFilter(filterType, startDate, endDate st
 			return nil, err
 		}
 
-		query = query.Where("date <= ?", parsedEndDate.Add(24*time.Hour).Add(-time.Second)) // untuk mencakup hingga akhir hari
+		query = query.Where("created_at <= ?", parsedEndDate.Add(24*time.Hour).Add(-time.Second)) // untuk mencakup hingga akhir hari
 	}
-
-	query = query.Where("deleted_at IS NULL")
 
 	err := query.Where("user_id = ?", userId).Find(&data).Error
 	return data, err

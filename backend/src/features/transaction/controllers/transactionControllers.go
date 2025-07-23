@@ -30,10 +30,10 @@ func(t *TransactionControllers) GetTransactionFilter(c echo.Context) error {
 	startDate := c.QueryParam("start")
 	endDate := c.QueryParam("end")
 
-	if filterType != "" && filterType != "Income" && filterType != "Expense" {
+	if filterType != "" && filterType != "Income" && filterType != "Expenses" {
 		return c.JSON(http.StatusBadRequest, echo.Map{
 			"status":   "Failed",
-			"messages": "Invalid 'type' parameter. Must be 'income' or 'expense'.",
+			"messages": "Invalid 'type' parameter. Must be 'Income' or 'Expenses'.",
 		})
 	}
 
