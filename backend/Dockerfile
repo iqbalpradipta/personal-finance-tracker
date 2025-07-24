@@ -1,22 +1,14 @@
-FROM golang:1.24-alpine AS builder
+FROM golang:1.24
+
+ENV GO111MODULE=on
 
 WORKDIR /app
 
-COPY go.mod .
-COPY go.sum .
-
+COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
 
-RUN go build -o main
-
-FROM alpine:latest
-
-WORKDIR /app
-
-COPY --from=builder /app/main .
-
-EXPOSE 8000
+RUN go build -o main .
 
 CMD ["./main"]
