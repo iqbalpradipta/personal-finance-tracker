@@ -59,3 +59,83 @@ Go to the frontend
   npm install
   npm run dev
 ```
+
+## Route
+
+Register
+```
+POST http://{your-server}/api/register
+
+body: {
+    "name": "Admin",
+    "email": "admin@gmail.com",
+    "password": "admin"
+}
+```
+
+Login
+```
+POST http://{your-server}/api/login
+
+body: {
+    "email": "admin@gmail.com",
+    "password": "admin"
+}
+```
+
+Get User By Email
+```
+Need Headers: Authorization Bearer Token
+
+GET http://{your-server}/api/user/admin@gmail.com
+```
+
+GET Transaction
+```
+Need Headers: Authorization Bearer Token
+
+GET http://{your-server}/api/transactions?type=&start=&end
+```
+
+CREATE Transaction
+```
+Need Headers: Authorization Bearer Token
+
+POST http://{your-server}/api/transaction
+
+body: {
+    "type": "Expenses",
+    "amount": 50000,
+    "category": "Listrik",
+    "description": "Bayar Token Listrik"
+}
+```
+
+UPDATE Transaction
+```
+Need Headers: Authorization Bearer Token
+
+PUT http://{your-server}/api/transaction/{id-transaction}
+
+body: {
+    // "type": "Income",
+    "amount": 350000
+    // "category": "Gaji",
+    // "description": "Gaji Minggu ini"
+}
+```
+
+DELETE Transaction
+```
+Need Headers: Authorization Bearer Token
+
+DELETE http://{your-server}/api/transaction/{id-transaction}
+```
+
+GET Summary
+
+```
+Need Headers: Authorization Bearer Token
+
+GET http://{your-server}/api/summary
+```
