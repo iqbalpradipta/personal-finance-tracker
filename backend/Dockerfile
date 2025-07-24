@@ -1,6 +1,6 @@
-FROM golang:1.24
+FROM golang:1.24-alpine
 
-ENV GO111MODULE=on
+RUN apk add --no-cache git
 
 WORKDIR /app
 
@@ -9,6 +9,6 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o main .
+RUN go build -o main ./main.go
 
 CMD ["./main"]
